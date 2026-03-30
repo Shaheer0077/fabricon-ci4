@@ -18,7 +18,7 @@ $routes->post('api/admin/login', 'AuthController::loginAdmin');
 $routes->get('api/categories', 'CategoryController::index'); // Public
 $routes->group('api/categories', ['filter'=>'adminauth'], function($routes){
     $routes->post('', 'CategoryController::create');
-    $routes->put('(:segment)', 'CategoryController::update/$1');
+    $routes->post('(:segment)', 'CategoryController::update/$1');
     $routes->delete('(:segment)', 'CategoryController::delete/$1');
 });
 
@@ -27,7 +27,7 @@ $routes->get('api/products', 'ProductController::index'); // Public
 $routes->get('api/products/(:segment)', 'ProductController::show/$1'); // Public
 $routes->group('api/products', ['filter'=>'adminauth'], function($routes){
     $routes->post('', 'ProductController::create');
-    $routes->put('(:segment)', 'ProductController::update/$1');
+    $routes->post('(:segment)', 'ProductController::update/$1');
     $routes->delete('(:segment)', 'ProductController::delete/$1');
 });
 

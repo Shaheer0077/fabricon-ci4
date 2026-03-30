@@ -34,7 +34,8 @@ class ProductController extends ResourceController
         // Handle General Images
         $imagePaths = [];
         if (isset($files['images'])) {
-            foreach ($files['images'] as $file) {
+            $imageFiles = is_array($files['images']) ? $files['images'] : [$files['images']];
+            foreach ($imageFiles as $file) {
                 if ($file->isValid() && !$file->hasMoved()) {
                     $newName = $file->getRandomName();
                     $file->move(FCPATH . 'uploads/products', $newName);
@@ -88,7 +89,8 @@ class ProductController extends ResourceController
         $existingImages = $this->parseArray($data['existingImages'] ?? []);
         $newImages = [];
         if (isset($files['images'])) {
-            foreach ($files['images'] as $file) {
+            $imageFiles = is_array($files['images']) ? $files['images'] : [$files['images']];
+            foreach ($imageFiles as $file) {
                 if ($file->isValid() && !$file->hasMoved()) {
                     $newName = $file->getRandomName();
                     $file->move(FCPATH . 'uploads/products', $newName);

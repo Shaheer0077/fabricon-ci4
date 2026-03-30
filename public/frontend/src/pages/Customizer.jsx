@@ -58,6 +58,7 @@ const Customizer = () => {
     const viewStates = useRef({}); // { 'Front': { json: object, preview: dataURL } }
     const prevViewRef = useRef(null); // Init to null to avoid overwriting Front on mount
     const currentViewRef = useRef('Front'); // Tracks latest view for event listeners
+    const latestProductColorRef = useRef(productColor); // Tracks latest color across async boundaries
 
     const VIEW_OPTIONS = ['Front', 'Back', 'Left sleeve', 'Right sleeve', 'Inside label', 'Outside label'];
 
@@ -106,6 +107,11 @@ const Customizer = () => {
         '#ffff00', '#00ffff', '#ff00ff', '#808080', '#ffa500',
         '#800080', '#008000', '#000080', '#800000'
     ];
+
+    // Sync Ref with State
+    useEffect(() => {
+        latestProductColorRef.current = productColor;
+    }, [productColor]);
 
     useEffect(() => {
         console.log("Customizer: User is on Customizer with ID:", productId);
@@ -201,11 +207,11 @@ const Customizer = () => {
             viewStates.current = {};
             setViewSnapshots({});
             if (canvas) canvas.clear();
-            
+
             const initialResettedColor = product?.defaultColor || (product?.colors && product.colors.length > 0 ? product.colors[0] : '#ffffff');
             console.log("Customizer: Design Reset. Reverting to default:", initialResettedColor);
             setProductColor(initialResettedColor);
-            
+
             // Trigger background reload
             setView(current => {
                 const fresh = current === 'Front' ? 'Back' : 'Front';
@@ -487,7 +493,7 @@ const Customizer = () => {
                             height: img.height * scale,
                             left: center.x, top: center.y,
                             originX: 'center', originY: 'center',
-                            fill: productColor,
+                            fill: latestProductColorRef.current, // Use Ref to ensure absolute latest state
                             globalCompositeOperation: 'multiply',
                             selectable: false, evented: false,
                             data: { isBackground: true, type: 'color' },
@@ -543,6 +549,7 @@ const Customizer = () => {
 
             // B. Prepare for New View
             canvas.clear();
+            setColorLayer(null); // Clean up old layer reference before switching
             setSelectedObject(null);
 
             try {

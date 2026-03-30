@@ -77,7 +77,7 @@ const AdminCategories = () => {
             };
 
             if (editingCategory) {
-                await API.put(`/categories/${editingCategory.id}`, data, config);
+                await API.post(`/categories/${editingCategory.id}`, data, config);
             } else {
                 await API.post('/categories', data, config);
             }

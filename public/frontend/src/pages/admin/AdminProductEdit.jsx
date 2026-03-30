@@ -145,18 +145,18 @@ const AdminProductEdit = () => {
             formData.append('subcategory', subcategory);
             formData.append('description', description);
 
-            colors.split(',').map(c => c.trim()).filter(c => c).forEach(c => formData.append('colors', c));
+            colors.split(',').map(c => c.trim()).filter(c => c).forEach(c => formData.append('colors[]', c));
             formData.append('defaultColor', defaultColor);
-            sizes.split(',').map(s => s.trim()).filter(s => s).forEach(s => formData.append('sizes', s));
+            sizes.split(',').map(s => s.trim()).filter(s => s).forEach(s => formData.append('sizes[]', s));
             formData.append('isSpecialOffer', isSpecialOffer);
             formData.append('isEcoFriendly', isEcoFriendly);
 
             // General Images
             images.forEach((img) => {
                 if (typeof img === 'string') {
-                    formData.append('existingImages', img);
+                    formData.append('existingImages[]', img);
                 } else {
-                    formData.append('images', img);
+                    formData.append('images[]', img);
                 }
             });
 
@@ -171,7 +171,7 @@ const AdminProductEdit = () => {
             });
 
             if (id) {
-                await API.put(`/products/${id}`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+                await API.post(`/products/${id}`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
                 setShowSuccess(true);
                 setTimeout(() => {
                     setShowSuccess(false);
