@@ -283,66 +283,80 @@ const Checkout = () => {
 
         doc.save(`Fabricon_Order_${trackingInfo.trackingToken}.pdf`);
     };
-
+    //Checkout confirmation page
     if (orderPlaced && trackingInfo) {
         return (
             <div className="min-h-screen bg-white flex items-center justify-center px-6 py-18">
                 <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
+                    initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="max-w-2xl w-full text-center"
+                    transition={{ duration: 0.4 }}
+                    className="max-w-[520px] w-full text-center"
                 >
-                    <div className="w-24 h-24 bg-emerald-50 rounded-2xl flex items-center justify-center mx-auto mb-8 mt-10">
-                        <CheckCircle2 className="text-emerald-500" size={48} />
-                    </div>
-                    <h2 className="text-4xl font-black text-slate-900 mb-4 tracking-tight uppercase ">Order Confirmed!</h2>
-                    <p className="text-slate-500 font-medium mb-12 max-w-md mx-auto">
+                    {/* Icon */}
+                    <motion.div
+                        initial={{ scale: 0, rotate: -10 }}
+                        animate={{ scale: 1, rotate: 0 }}
+                        transition={{ type: 'spring', stiffness: 260, damping: 18 }}
+                        className="w-20 h-20 bg-[#fff5f0] border-[1.5px] border-[#ffd4c2] rounded-[28px] flex items-center justify-center mx-auto mb-7 mt-10"
+                    >
+                        <CheckCircle2 className="text-[#ff4d00]" size={40} />
+                    </motion.div>
+
+                    <h2 className="text-3xl font-black text-slate-900 mb-3 tracking-tight uppercase">Order Confirmed!</h2>
+                    <p className="text-slate-500 font-medium mb-8 max-w-sm mx-auto leading-relaxed">
                         Your custom creation for <span className="text-slate-900 font-bold">{product.title}</span> is now in our production pipeline.
                     </p>
 
-                    <div className="bg-slate-50 border border-slate-100 rounded-3xl p-8 mb-12 text-left shadow-sm">
-                        <div className="flex items-center justify-between mb-6 pb-6 border-b border-white">
+                    {/* Tracking card */}
+                    <div className="bg-slate-50 border border-slate-100 rounded-[20px] p-7 mb-4 text-left">
+
+                        <div className="flex items-start justify-between gap-3 pb-6 border-b border-white mb-6">
                             <div>
-                                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Tracking Code</h4>
-                                <p className="text-2xl font-black text-[#ff4d00] tracking-wider select-all">{trackingInfo.trackingToken}</p>
+                                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] mb-2">Tracking Code</h4>
+                                <p className="text-[28px] font-black text-[#ff4d00] tracking-widest font-mono select-all leading-none">
+                                    {trackingInfo.trackingToken}
+                                </p>
                             </div>
                             <button
                                 onClick={() => navigate(`/track/${trackingInfo.trackingToken}`)}
-                                className="px-6 py-3 bg-white border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-[#ff4d00] hover:text-[#ff4d00] transition-all shadow-sm"
+                                className="mt-1 px-5 py-2.5 bg-white border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-[#ff4d00] hover:text-[#ff4d00] transition-all whitespace-nowrap"
                             >
                                 Track Now
                             </button>
                         </div>
-                        <div className="grid grid-cols-2 gap-8 mb-8">
+
+                        <div className="grid grid-cols-2 gap-4 mb-6">
                             <div>
-                                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Customer</h4>
-                                <p className="text-xs font-bold text-slate-900">{formData.fullName}</p>
+                                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Customer</h4>
+                                <p className="text-[13px] font-bold text-slate-900">{formData.fullName}</p>
                             </div>
                             <div>
-                                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Order Date</h4>
-                                <p className="text-xs font-bold text-slate-900">{new Date().toLocaleDateString()}</p>
+                                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Order Date</h4>
+                                <p className="text-[13px] font-bold text-slate-900">{new Date().toLocaleDateString()}</p>
                             </div>
                         </div>
 
                         <button
                             onClick={generateOrderPDF}
-                            className="w-full flex items-center justify-center gap-3 py-4 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-[#ff4d00] transition-all shadow-lg shadow-slate-100"
+                            className="w-full flex items-center justify-center gap-2.5 py-4 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-[#ff4d00] transition-all"
                         >
                             <ShoppingBag size={14} />
                             Download Order Details (PDF)
                         </button>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row gap-4">
+                    {/* Bottom actions */}
+                    <div className="grid grid-cols-2 gap-3">
                         <button
                             onClick={() => navigate('/dashboard')}
-                            className="flex-1 py-5 bg-white border-2 border-slate-900 text-slate-900 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-slate-50 transition-all"
+                            className="py-[17px] bg-white border-2 border-slate-900 text-slate-900 rounded-xl font-black text-[10px] uppercase tracking-[0.18em] hover:bg-slate-50 transition-all"
                         >
                             View Dashboard
                         </button>
                         <button
                             onClick={() => navigate('/catalog')}
-                            className="flex-1 py-5 bg-[#ff4d00] text-white rounded-xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-black transition-all shadow-xl shadow-orange-100"
+                            className="py-[17px] bg-[#ff4d00] text-white rounded-xl font-black text-[10px] uppercase tracking-[0.18em] hover:bg-black transition-all shadow-xl shadow-orange-100"
                         >
                             Back to Shop
                         </button>
