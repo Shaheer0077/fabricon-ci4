@@ -38,10 +38,9 @@ const Navbar = () => {
                         <Link to="/catalog/kids" className="text-xs font-black uppercase tracking-widest text-slate-400 hover:text-[#ff4d00] transition-colors">Kids</Link>
                     </div>
                 </div>
-
                 {/* Right: Actions */}
-                <div className="flex items-center gap-4">
-                    <div className="hidden md:flex items-center relative group min-w-[240px]">
+                <div className="flex items-center gap-4 flex-1 justify-end">
+                    <div className="hidden md:flex items-center relative group w-full max-w-[420px]">
                         <form onSubmit={handleSearch} className="w-full">
                             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#ff4d00] transition-colors">
                                 <Search size={18} />
@@ -56,9 +55,10 @@ const Navbar = () => {
                         </form>
                     </div>
 
-                    <div className="h-8 w-px bg-slate-100 mx-2 hidden sm:block" />
 
-                    <div className="flex items-center gap-2">
+                    {/* <div className="h-8 w-px bg-slate-100 mx-2 hidden sm:block" /> */}
+
+                    {/* <div className="flex items-center gap-2">
                         <Link to="/admin" className="p-3 text-slate-400 hover:text-[#ff4d00] transition-colors" title="Management Console">
                             <LayoutDashboard size={20} />
                         </Link>
@@ -66,7 +66,7 @@ const Navbar = () => {
                             <ShoppingCart size={20} />
                             <span className="absolute top-2 right-2 w-2 h-2 bg-[#ff4d00] rounded-full" />
                         </button>
-                    </div>
+                    </div> */}
 
                     <Link to="/dashboard" className="flex items-center gap-2 bg-slate-900 hover:bg-black text-white px-4 md:px-6 py-2.5 md:py-3 rounded-md md:rounded-md text-[10px] md:text-[11px] font-black uppercase tracking-widest transition-all transform active:scale-95 shadow-xl shadow-slate-200">
                         Track Orders
