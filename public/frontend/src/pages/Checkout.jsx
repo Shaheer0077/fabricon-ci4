@@ -146,11 +146,14 @@ const Checkout = () => {
 
             const { data } = await API.post('/orders', orderData);
 
+            // Access the actual order information from the nested 'data' property
+            const orderInfo = data.data;
+
             // Save to localStorage for the User Dashboard
             const localOrders = JSON.parse(localStorage.getItem('fabricon_orders') || '[]');
             const newOrder = {
-                id: data.id,
-                token: data.trackingToken,
+                id: orderInfo.id,
+                token: orderInfo.trackingToken,
                 date: new Date().toISOString(),
                 title: product.title,
                 image: customizedImage || product.images?.[0],
@@ -158,7 +161,7 @@ const Checkout = () => {
             };
             localStorage.setItem('fabricon_orders', JSON.stringify([newOrder, ...localOrders]));
 
-            setTrackingInfo(data);
+            setTrackingInfo(orderInfo);
             setOrderPlaced(true);
         } catch (error) {
             console.error('Error placing order:', error);
