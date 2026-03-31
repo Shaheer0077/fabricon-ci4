@@ -46,7 +46,15 @@ class OrderController extends ResourceController
     // GET /api/orders
     public function index()
     {
-        $orders = $this->model->orderBy('created_at','DESC')->findAll();
+        $orders = $this->model->findAll();
+
+        // Sort in PHP to avoid "Out of sort memory" MySQL error
+        usort($orders, function($a, $b) {
+            $dateA = $a['created_at'] ?? '0';
+            $dateB = $b['created_at'] ?? '0';
+            return strcmp($dateB, $dateA);
+        });
+
         $formatted = array_map([$this, 'formatOrder'], $orders);
         return $this->respond($formatted);
     }
@@ -76,8 +84,10 @@ class OrderController extends ResourceController
     {
         if (!$order) return $order;
         $order['shippingAddress'] = $order['shipping_address'] ?? null;
-        $order['totalPrice'] = $order['total_price'] ?? 0;
+        $order['totalPrice'] = (float)($order['total_price'] ?? 0);
         $order['trackingToken'] = $order['tracking_token'] ?? null;
+        $order['createdAt'] = $order['created_at'] ?? null;
+        $order['updatedAt'] = $order['updated_at'] ?? null;
         return $order;
     }
 }

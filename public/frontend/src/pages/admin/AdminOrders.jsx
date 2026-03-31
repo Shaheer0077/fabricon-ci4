@@ -84,7 +84,7 @@ const AdminOrders = () => {
 
     const filteredOrders = orders.filter(o => {
         const matchesSearch = o.customer?.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            o.id.toLowerCase().includes(searchTerm.toLowerCase());
+            String(o.id).toLowerCase().includes(searchTerm.toLowerCase());
         const matchesStatus = filterStatus === 'All' || o.status === filterStatus;
         return matchesSearch && matchesStatus;
     });
@@ -159,7 +159,7 @@ const AdminOrders = () => {
                         {[
                             { label: 'Today Orders', value: orders.filter(o => new Date(o.createdAt).toDateString() === new Date().toDateString()).length, icon: ShoppingBag, color: 'text-blue-600', bg: 'bg-blue-50' },
                             { label: 'Pending', value: orders.filter(o => o.status === 'Pending').length, icon: Clock, color: 'text-orange-600', bg: 'bg-orange-50' },
-                            { label: 'Total Revenue', value: `$${orders.reduce((acc, o) => acc + o.totalPrice, 0).toLocaleString()}`, icon: TrendingUp, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+                            { label: 'Total Revenue', value: `$${orders.reduce((acc, o) => acc + Number(o.totalPrice || 0), 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, icon: TrendingUp, color: 'text-emerald-600', bg: 'bg-emerald-50' },
                             { label: 'Delivered', value: orders.filter(o => o.status === 'Delivered').length, icon: CheckCircle2, color: 'text-purple-600', bg: 'bg-purple-50' }
                         ].map((stat, i) => (
                             <motion.div
@@ -216,7 +216,7 @@ const AdminOrders = () => {
                                                     className="hover:bg-slate-50/50 transition-all group"
                                                 >
                                                     <td className="px-10 py-5">
-                                                        <span className="font-mono text-[11px] font-bold text-slate-400 group-hover:text-slate-900 transition-colors">#{order.id.slice(-8).toUpperCase()}</span>
+                                                        <span className="font-mono text-[11px] font-bold text-slate-400 group-hover:text-slate-900 transition-colors">#{String(order.id).toUpperCase()}</span>
                                                     </td>
                                                     <td className="px-10 py-5">
                                                         <p className="font-black text-slate-900 text-sm leading-tight mb-1">{order.customer?.fullName}</p>
@@ -281,7 +281,7 @@ const AdminOrders = () => {
                                         {React.createElement(getStatusIcon(selectedOrder.status), { size: 24 })}
                                     </div>
                                     <div>
-                                        <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">Order #{selectedOrder.id.slice(-8).toUpperCase()}</h2>
+                                        <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">Order #{String(selectedOrder.id).toUpperCase()}</h2>
                                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Status: {selectedOrder.status}</p>
                                     </div>
                                 </div>

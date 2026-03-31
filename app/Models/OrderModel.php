@@ -8,7 +8,12 @@ class OrderModel extends Model
     protected $table = 'orders';
     protected $primaryKey = 'id';
     protected $allowedFields = [
-        'customer', 'shipping_address', 'items', 'total_price', 'status', 'tracking_token'
+        'customer',
+        'shipping_address',
+        'items',
+        'total_price',
+        'status',
+        'tracking_token'
     ];
     protected $returnType = 'array';
     protected $useTimestamps = true;
@@ -20,8 +25,8 @@ class OrderModel extends Model
 
     protected function encodeFields(array $data)
     {
-        foreach(['customer','shipping_address','items'] as $field){
-            if(isset($data['data'][$field]) && is_array($data['data'][$field])){
+        foreach (['customer', 'shipping_address', 'items'] as $field) {
+            if (isset($data['data'][$field]) && is_array($data['data'][$field])) {
                 $data['data'][$field] = json_encode($data['data'][$field]);
             }
         }
@@ -30,11 +35,26 @@ class OrderModel extends Model
 
     protected function decodeFields(array $data)
     {
-        foreach(['customer','shipping_address','items'] as $field){
-            if(isset($data['data'][$field])){
-                $data['data'][$field] = json_decode($data['data'][$field], true);
+        if (empty($data['data']))
+            return $data;
+
+        if ($data['singleton']) {
+            $data['data'] = $this->decodeRow($data['data']);
+        } else {
+            foreach ($data['data'] as &$row) {
+                $row = $this->decodeRow($row);
             }
         }
         return $data;
+    }
+
+    private function decodeRow($row)
+    {
+        foreach (['customer', 'shipping_address', 'items'] as $field) {
+            if (isset($row[$field]) && is_string($row[$field])) {
+                $row[$field] = json_decode($row[$field], true);
+            }
+        }
+        return $row;
     }
 }

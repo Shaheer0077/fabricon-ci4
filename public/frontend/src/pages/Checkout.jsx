@@ -96,7 +96,7 @@ const Checkout = () => {
 
     // Dynamic Pricing Logic: Higher quantity = Lower unit price
     const getUnitPrice = (qty) => {
-        const basePrice = product.price || 0;
+        const basePrice = Number(product.price || 0);
         if (qty === 1) return basePrice * 1.2; // 20% premium for single item
         if (qty < 5) return basePrice;           // Standard price for 2-4 items
         if (qty < 20) return basePrice * 0.9;    // 10% discount for 5-19 items

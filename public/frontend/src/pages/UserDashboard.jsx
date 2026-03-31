@@ -121,7 +121,7 @@ const UserDashboard = () => {
                             <div className="space-y-4">
                                 {orders.map((order, i) => (
                                     <motion.div
-                                        key={order.id}
+                                        key={order.token || order.id || i}
                                         initial={{ opacity: 0, y: 20 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: i * 0.05 }}
