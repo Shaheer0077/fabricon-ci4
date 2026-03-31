@@ -8,7 +8,7 @@ const fabric = fabricModule.fabric || fabricModule.default || fabricModule;
 import {
     Type, Image as ImageIcon, Trash2, Layers, Box, Upload,
     Sticker, Zap, Crown, Droplets, X, ShoppingCart, Maximize2,
-    Copy, Palette, ChevronLeft, ArrowRight
+    Copy, Palette, ChevronLeft, ArrowRight, Download
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import API from '../api/client';
@@ -570,7 +570,7 @@ const Customizer = () => {
                     const fin = document.createElement('canvas');
                     fin.width = 500; fin.height = 580;
                     const ctx = fin.getContext('2d');
-                    ctx.fillStyle = '#f3f4f6';
+                    ctx.fillStyle = '#ffffff';
                     ctx.fillRect(0, 0, 500, 580);
                     // base
                     ctx.drawImage(img, dx, dy, W * scale, H * scale);
@@ -1047,21 +1047,21 @@ const Customizer = () => {
                     </div>
                 </div>
 
-                <div className="hidden md:flex h-24 bg-white border-t border-slate-100 px-10 items-center justify-between z-30 shadow-2xl">
-                    <div className="flex items-center gap-10">
+                <div className="hidden md:flex h-24 bg-white border-t border-slate-100 px-6 md:px-10 items-center justify-between z-30 shadow-2xl">
+                    <div className="flex items-center gap-6 lg:gap-10">
                         <div className="flex flex-col">
                             <span className="text-[10px] font-black text-[#ff4d00] uppercase tracking-widest mb-1">Total Price</span>
-                            <span className="text-3xl font-black text-slate-900 tracking-tighter">${Number(product?.price || 0).toFixed(2)}</span>
+                            <span className="text-2xl lg:text-3xl font-black text-slate-900 tracking-tighter">${Number(product?.price || 0).toFixed(2)}</span>
                         </div>
-                        <div className="text-center border-l border-slate-100 pl-10">
+                        <div className="text-center border-l border-slate-100 pl-6 lg:pl-10">
                             <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 block">Estimation</span>
                             <p className="text-[11px] font-bold text-slate-500">Ship: 48h</p>
                         </div>
                     </div>
-                    <div className="flex items-center gap-4">
-                        <button onClick={handleDownloadAll} className="px-8 py-4 bg-black text-white rounded-md font-black text-[10px] uppercase tracking-widest hover:bg-[#ff4d00] transition-all">Save Draft</button>
-                        <button onClick={generateFinalImage} className="flex items-center gap-3 px-5 py-3 bg-black text-white rounded-md font-black text-[10px] uppercase tracking-widest hover:bg-[#ff4d00] transition-all shadow-2xl shadow-orange-500/20 active:scale-95">
-                            <ShoppingCart size={20} /> Checkout
+                    <div className="flex items-center gap-3 md:gap-4">
+                        <button onClick={handleDownloadAll} className="px-4 lg:px-8 py-3.5 lg:py-4 bg-black text-white rounded-md font-black text-[10px] uppercase tracking-widest hover:bg-[#ff4d00] transition-all">Save Draft</button>
+                        <button onClick={generateFinalImage} className="flex items-center gap-2 lg:gap-3 px-4 lg:px-5 py-3 lg:py-3.5 bg-black text-white rounded-md font-black text-[10px] uppercase tracking-widest hover:bg-[#ff4d00] transition-all shadow-2xl shadow-orange-500/20 active:scale-95">
+                            <ShoppingCart size={18} /> Checkout
                         </button>
                     </div>
                 </div>
@@ -1074,7 +1074,7 @@ const Customizer = () => {
                     const img = viewSnapshots[v] || getViewImage(v);
                     return (
                         <button key={v} onClick={() => setView(v)}
-                            className={`group relative aspect-[4/5] w-full rounded-2xl border-2 transition-all p-2 bg-slate-50 overflow-hidden ${view === v ? 'border-[#ff4d00] shadow-lg' : 'border-transparent hover:border-slate-200'}`}
+                            className={`group relative aspect-[4/5] w-full rounded-2xl border-2 transition-all p-2 bg-white overflow-hidden ${view === v ? 'border-[#ff4d00] shadow-lg' : 'border-transparent hover:border-slate-100 hover:bg-slate-50/50'}`}
                         >
                             <div className="h-full w-full flex items-center justify-center">
                                 {img ? <img src={img} alt={v} className="w-full h-full object-contain transition-transform group-hover:scale-105" />
@@ -1092,7 +1092,7 @@ const Customizer = () => {
             <div className={`lg:hidden absolute left-1/2 -translate-x-1/2 z-40 bg-white/90 backdrop-blur-md shadow-xl px-2 py-1.5 rounded-2xl border border-slate-100 flex items-center gap-2 overflow-x-auto max-w-[95vw] no-scrollbar transition-all duration-500 ${isMobileMenuOpen ? 'top-2 scale-90 opacity-60' : 'top-[85px]'}`}>
                 {VIEW_OPTIONS.filter(v => getViewImage(v) !== null).map(v => (
                     <button key={v} onClick={() => setView(v)}
-                        className={`whitespace-nowrap px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${view === v ? 'bg-[#ff4d00] text-white shadow-lg' : 'text-slate-400 bg-slate-50'}`}
+                        className={`whitespace-nowrap px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${view === v ? 'bg-[#ff4d00] text-white shadow-lg' : 'text-slate-400 bg-white border border-slate-100/50'}`}
                     >{v}</button>
                 ))}
             </div>
@@ -1105,7 +1105,11 @@ const Customizer = () => {
                         <span className="text-xl font-black text-slate-900">${Number(product?.price || 0).toFixed(2)}</span>
                     </div>
                     <div className="flex items-center h-full">
-                        <div className="flex items-center gap-7 mr-6">
+                        <div className="flex items-center gap-5 mr-5 md:gap-7 md:mr-6">
+                            <button onClick={handleDownloadAll} 
+                                className="flex flex-col items-center gap-1 text-slate-400 hover:text-[#ff4d00]">
+                                <Download size={18} /><span className="text-[8px] font-black uppercase">Draft</span>
+                            </button>
                             <button onClick={() => { setActiveTab('product'); setIsMobileMenuOpen(true); }}
                                 className={`flex flex-col items-center gap-1 ${activeTab === 'product' && isMobileMenuOpen ? 'text-[#ff4d00]' : 'text-slate-400'}`}>
                                 <Box size={18} /><span className="text-[8px] font-black uppercase">Product</span>
@@ -1115,7 +1119,7 @@ const Customizer = () => {
                                 <Palette size={18} /><span className="text-[8px] font-black uppercase">Design</span>
                             </button>
                         </div>
-                        <button onClick={generateFinalImage} className="bg-[#e11d48] text-white w-20 h-full flex items-center justify-center active:scale-95 transition-all">
+                        <button onClick={generateFinalImage} className="bg-[#ff4d00] text-white w-20 h-full flex items-center justify-center active:scale-95 transition-all">
                             <ArrowRight size={28} strokeWidth={3} />
                         </button>
                     </div>

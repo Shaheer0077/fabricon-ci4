@@ -68,7 +68,7 @@ const Navbar = () => {
                         </button>
                     </div>
 
-                    <Link to="/dashboard" className="hidden sm:flex items-center gap-2 bg-slate-900 hover:bg-black text-white px-6 py-3 rounded-md text-[11px] font-black uppercase tracking-widest transition-all transform active:scale-95 shadow-xl shadow-slate-200">
+                    <Link to="/dashboard" className="flex items-center gap-2 bg-slate-900 hover:bg-black text-white px-4 md:px-6 py-2.5 md:py-3 rounded-md md:rounded-md text-[10px] md:text-[11px] font-black uppercase tracking-widest transition-all transform active:scale-95 shadow-xl shadow-slate-200">
                         Track Orders
                     </Link>
                 </div>
