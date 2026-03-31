@@ -304,7 +304,15 @@ const Customizer = () => {
 
         fabric.Object.prototype.controls.deleteControl = new fabric.Control({
             x: 0.5, y: -0.5, offsetY: -16, offsetX: 16, cursorStyle: 'pointer',
-            mouseUpHandler: (_, t) => { t.target.canvas.remove(t.target); t.target.canvas.requestRenderAll(); return true; },
+            mouseUpHandler: (_, transform) => {
+                const target = transform.target;
+                const canvas = target.canvas || fabricCanvas.current;
+                if (canvas) {
+                    canvas.remove(target);
+                    canvas.requestRenderAll();
+                }
+                return true;
+            },
             render: (ctx, left, top) => {
                 ctx.save(); ctx.translate(left, top);
                 ctx.beginPath(); ctx.arc(0, 0, 12, 0, Math.PI * 2);
@@ -328,15 +336,24 @@ const Customizer = () => {
         fc.on('selection:cleared', () => setSelectedObject(null));
 
         const onChange = () => {
+            if (loadingViewRef.current) return;
+            
+            const av = currentViewRef.current;
+            console.log(`Customizer: State changed for ${av}`);
+            
             setCanvasObjects([...fc.getObjects()]);
+            
+            // Immediately update JSON representation
+            const json = fc.toDatalessJSON(['id', 'data', 'selectable', 'evented']);
+            json.objects = json.objects.filter(o => !o.data?.isBackground);
+            
+            viewStates.current[av] = { 
+                ...viewStates.current[av], 
+                json 
+            };
+
             updateCurrentViewSnapshot(fc);
-            if (!loadingViewRef.current) {
-                const av = currentViewRef.current;
-                const json = fc.toDatalessJSON(['id', 'data', 'selectable', 'evented']);
-                json.objects = json.objects.filter(o => !o.data?.isBackground);
-                viewStates.current[av] = { ...viewStates.current[av], json };
-                saveDesign();
-            }
+            saveDesign();
         };
         fc.on('object:added', onChange);
         fc.on('object:removed', onChange);
@@ -353,16 +370,27 @@ const Customizer = () => {
     const updateCurrentViewSnapshot = (tc) => {
         if (!tc || loadingViewRef.current) return;
         if (snapshotTimeout.current) clearTimeout(snapshotTimeout.current);
+        
         snapshotTimeout.current = setTimeout(() => {
             try {
                 const av = currentViewRef.current;
-                const url = tc.toDataURL({ format: 'png', multiplier: 1, quality: 0.8 });
+                // Force a render to ensure snapshot includes latest manual changes
+                tc.renderAll();
+                const url = tc.toDataURL({ format: 'png', multiplier: 1, quality: 0.9 });
+                
                 setViewSnapshots(prev => {
                     if (prev[av] === url) return prev;
-                    if (viewStates.current[av]) { viewStates.current[av].preview = url; saveDesign(); }
+                    
+                    // Critical: Ensure view state exists for checkout and persistence
+                    if (!viewStates.current[av]) viewStates.current[av] = {};
+                    viewStates.current[av].preview = url;
+                    
+                    saveDesign();
                     return { ...prev, [av]: url };
                 });
-            } catch (e) { console.warn('Snapshot failed', e); }
+            } catch (e) {
+                console.warn('Customizer: Snapshot failed', e);
+            }
         }, 150);
     };
 
@@ -455,15 +483,24 @@ const Customizer = () => {
             loadingViewRef.current = currentView;
 
             // Save state of previous view before switching
-            if (prevView && prevView !== currentView && canvas.getObjects().length > 0) {
-                const json = canvas.toDatalessJSON(['id', 'data', 'selectable', 'evented']);
-                json.objects = json.objects.filter(o => !o.data?.isBackground);
-                viewStates.current[prevView] = {
-                    ...viewStates.current[prevView],
-                    json,
-                    preview: canvas.toDataURL({ format: 'png', multiplier: 1 }),
-                };
-                saveDesign();
+            if (prevView && prevView !== currentView) {
+                const objects = canvas.getObjects().filter(o => !o.data?.isBackground);
+                if (objects.length > 0) {
+                    const json = canvas.toDatalessJSON(['id', 'data', 'selectable', 'evented']);
+                    json.objects = json.objects.filter(o => !o.data?.isBackground);
+                    canvas.renderAll(); // Ensure render is complete
+                    const preview = canvas.toDataURL({ format: 'png', multiplier: 1 });
+                    
+                    viewStates.current[prevView] = {
+                        ...viewStates.current[prevView],
+                        json,
+                        preview
+                    };
+                    
+                    // Immediately update sidebar thumbnails to reflect designs
+                    setViewSnapshots(prev => ({ ...prev, [prevView]: preview }));
+                    saveDesign();
+                }
             }
 
             // Prepare canvas for new view
@@ -511,7 +548,7 @@ const Customizer = () => {
     // FIX: re-generate tinted layer via native canvas instead of changing fill
 
     useEffect(() => {
-        if (!canvas || !colorReady) return;
+        if (!canvas || !colorReady || loadingViewRef.current) return;
 
         const syncColor = async () => {
             // 1. Update current view if it's ready
@@ -586,7 +623,7 @@ const Customizer = () => {
                         const tfc = new fabric.Canvas(el, { width: 500, height: 580, renderOnAddRemove: false, enableRetinaScaling: false });
                         fabric.util.enlivenObjects(saved.json.objects, (objs) => {
                             objs.forEach(o => { tfc.add(o); tfc.bringToFront(o); });
-                            tfc.requestRenderAll();
+                            tfc.renderAll(); // MUST be synchronous
                             ctx.drawImage(el, 0, 0);
                             try { tfc.dispose(); } catch (_) { }
                             resolve(fin.toDataURL('image/png'));
@@ -692,9 +729,22 @@ const Customizer = () => {
 
     const updateObjectProperty = (prop, value) => {
         if (!canvas || !selectedObject) return;
+        
         selectedObject.set(prop, value);
+        if (prop === 'text' && selectedObject.setCoords) selectedObject.setCoords();
+        
         canvas.requestRenderAll();
         setCanvasObjects([...canvas.getObjects()]);
+        
+        // Manual updates since .set() doesn't fire events
+        const av = currentViewRef.current;
+        const json = canvas.toDatalessJSON(['id', 'data', 'selectable', 'evented']);
+        json.objects = json.objects.filter(o => !o.data?.isBackground);
+        
+        if (!viewStates.current[av]) viewStates.current[av] = {};
+        viewStates.current[av].json = json;
+        
+        updateCurrentViewSnapshot(canvas);
         saveDesign();
     };
 
@@ -768,7 +818,7 @@ const Customizer = () => {
 
             {/* 2. Panel / Bottom Sheet */}
             <div className={`
-                fixed inset-x-0 bottom-0 z-[60] md:sticky md:top-[80px] md:inset-auto md:flex
+                fixed inset-x-0 bottom-0 z-[60] md:sticky md:top-[80px] md:inset-auto md:flex md:flex-col
                 md:w-[320px] bg-white md:border-r border-slate-200 shadow-[0_-20px_50px_-20px_rgba(0,0,0,0.2)] md:shadow-none
                 transition-all duration-300 ease-in-out rounded-t-[2.5rem] md:rounded-none
                 ${isMobileMenuOpen ? 'h-[50vh] flex flex-col' : 'h-0 hidden'} md:h-[calc(100vh-80px)] md:z-40
