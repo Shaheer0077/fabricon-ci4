@@ -395,13 +395,16 @@ const Customizer = () => {
                     if (!baseImg || loadingViewRef.current !== viewName) return resolve(null);
 
                     baseImg.set({
-                        scaleX: scale, scaleY: scale,
-                        left: center.x, top: center.y,
-                        originX: 'center', originY: 'center',
-                        selectable: false, evented: false,
+                        scaleX: scale,
+                        scaleY: scale,
+                        originX: 'center',
+                        originY: 'center',
+                        selectable: false,
+                        evented: false,
                         data: { isBackground: true, type: 'texture' },
                     });
                     canvas.add(baseImg);
+                    canvas.centerObject(baseImg);
                     canvas.sendToBack(baseImg);
 
                     // Layer 2: tinted version (native canvas 2D, transparent-safe)
@@ -411,10 +414,12 @@ const Customizer = () => {
                         if (!tintImg || loadingViewRef.current !== viewName) return resolve(null);
 
                         tintImg.set({
-                            scaleX: scale, scaleY: scale,
-                            left: center.x, top: center.y,
-                            originX: 'center', originY: 'center',
-                            selectable: false, evented: false,
+                            scaleX: scale,
+                            scaleY: scale,
+                            originX: 'center',
+                            originY: 'center',
+                            selectable: false,
+                            evented: false,
                             opacity: 0.88,
                             data: { isBackground: true, type: 'color' },
                         });
@@ -422,6 +427,7 @@ const Customizer = () => {
                         tintImg._sourceHtmlImg = htmlImg;
 
                         canvas.add(tintImg);
+                        canvas.centerObject(tintImg);
                         canvas.moveTo(tintImg, 1);
                         setColorLayer(tintImg);
 
@@ -462,6 +468,7 @@ const Customizer = () => {
 
             // Prepare canvas for new view
             canvas.clear();
+            canvas.setViewportTransform([1, 0, 0, 1, 0, 0]); // Reset any pan/zoom
             setColorLayer(null);
             setSelectedObject(null);
 
@@ -747,7 +754,7 @@ const Customizer = () => {
         <div className="flex flex-col md:flex-row h-screen bg-white md:bg-[#f3f4f6] pt-20 overflow-hidden relative">
 
             {/* 1. Left Sidebar */}
-            <div className="hidden md:flex w-[80px] bg-white border-r border-slate-200 flex-col items-center py-6 gap-2 z-30">
+            <div className="hidden md:flex w-[80px] bg-white border-r border-slate-200 flex-col items-center pt-10 py-6 gap-2 z-30">
                 {SIDEBAR_TOOLS.map(tool => (
                     <button key={tool.id}
                         onClick={() => { setActiveTab(tool.id); setIsMobileMenuOpen(true); }}
@@ -761,10 +768,10 @@ const Customizer = () => {
 
             {/* 2. Panel / Bottom Sheet */}
             <div className={`
-                fixed inset-x-0 bottom-0 z-[60] md:relative md:inset-auto md:flex
+                fixed inset-x-0 bottom-0 z-[60] md:sticky md:top-[80px] md:inset-auto md:flex
                 md:w-[320px] bg-white md:border-r border-slate-200 shadow-[0_-20px_50px_-20px_rgba(0,0,0,0.2)] md:shadow-none
                 transition-all duration-300 ease-in-out rounded-t-[2.5rem] md:rounded-none
-                ${isMobileMenuOpen ? 'h-[50vh] flex flex-col' : 'h-0 hidden'} md:h-full
+                ${isMobileMenuOpen ? 'h-[50vh] flex flex-col' : 'h-0 hidden'} md:h-[calc(100vh-80px)] md:z-40
             `}>
                 <div className="flex items-center justify-between p-6 pb-2 md:hidden">
                     <button onClick={() => activeTab === 'design-hub' ? setIsMobileMenuOpen(false) : setActiveTab('design-hub')}
@@ -777,7 +784,7 @@ const Customizer = () => {
                     </h3>
                 </div>
 
-                <div className="p-7 pt-2 h-full overflow-y-auto custom-scrollbar flex-1 bg-white rounded-t-[2.5rem] md:rounded-none">
+                <div className="p-7 pt-4 md:pt-10 h-full overflow-y-auto custom-scrollbar flex-1 bg-white rounded-t-[2.5rem] md:rounded-none">
                     <AnimatePresence mode="wait">
 
                         {activeTab === 'design-hub' && (
@@ -1032,10 +1039,10 @@ const Customizer = () => {
                     </button>
                 </div>
 
-                <div className={`flex-grow flex items-center justify-center p-2 min-h-0 overflow-hidden relative transition-all duration-500 ${isMobileMenuOpen ? 'h-[25vh] md:h-full -translate-y-6 md:translate-y-0' : 'h-full'}`}>
-                    <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
-                        <div className={`relative overflow-hidden z-10 transition-all duration-500 origin-center ${isMobileMenuOpen ? 'scale-[0.55] sm:scale-[0.7]' : 'scale-[0.9] sm:scale-80'} md:scale-90 lg:scale-100`} style={{ width: 500, height: 580 }}>
-                            <canvas ref={canvasRef} width={500} height={580} style={{ display: 'block' }} />
+                <div className={`flex-grow flex items-center justify-center p-4 min-h-0 overflow-hidden relative transition-all duration-500 ${isMobileMenuOpen ? 'h-[30vh] md:h-full -translate-y-4 md:translate-y-0' : 'h-full'}`}>
+                    <div className="relative w-full h-full flex items-center justify-center">
+                        <div className={`relative transition-all duration-500 origin-center ${isMobileMenuOpen ? 'scale-[0.5] sm:scale-[0.7] md:scale-90 lg:scale-100' : 'scale-[0.7] sm:scale-[0.8] md:scale-90 lg:scale-100'}`} style={{ width: 500, height: 580 }}>
+                            <canvas ref={canvasRef} width={500} height={580} className="max-w-full h-auto block mx-auto" />
                         </div>
                     </div>
                 </div>
